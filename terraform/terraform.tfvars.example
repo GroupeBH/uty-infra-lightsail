@@ -1,0 +1,28 @@
+aws_region        = "eu-central-1"
+availability_zone = "eu-central-1a"
+
+instance_name  = "uty-api-prod"
+static_ip_name = "uty-api-prod-ip"
+
+# Verify current values before production:
+# aws lightsail get-bundles --include-inactive
+# aws lightsail get-blueprints --include-inactive
+lightsail_bundle_id   = "micro_3_1"
+lightsail_blueprint_id = "ubuntu_24_04"
+
+# Restrict SSH to your real admin public IP/CIDR.
+admin_cidr = "203.0.113.10/32"
+
+# Optional: CI/CD runners or VPN ranges allowed in addition to admin_cidr.
+extra_ssh_cidrs = []
+
+# Existing Lightsail key pair name in this AWS region.
+key_pair_name = ""
+ssh_user      = "ubuntu"
+
+domain_name = "api.uty-app.com"
+
+tags = {
+  Environment = "production"
+  Application = "uty-api"
+}

@@ -1,0 +1,4 @@
+bucket  = "uty-lightsail-tfstate"
+key     = "uty-api-lightsail/terraform.tfstate"
+region  = "eu-central-1"
+encrypt = true

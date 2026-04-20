@@ -1,0 +1,149 @@
+- name: Deploy Uty API on AWS Lightsail
+  hosts: uty_api
+  become: true
+  gather_facts: true
+
+  vars:
+    app_dir: /opt/uty-api
+    app_image_tag: latest
+    caddy_image: caddy:2.8-alpine
+    caddy_email: ""
+    domain_name: ""
+    healthcheck_path: /health
+    docker_apt_arch: "{{ 'arm64' if ansible_architecture in ['aarch64', 'arm64'] else 'amd64' }}"
+    healthcheck_scheme: "{{ 'https' if domain_name | length > 0 else 'http' }}"
+    healthcheck_host: "{{ domain_name if domain_name | length > 0 else '127.0.0.1' }}"
+    healthcheck_url: "{{ healthcheck_scheme }}://{{ healthcheck_host }}{{ healthcheck_path }}"
+
+  pre_tasks:
+    - name: Validate deployment inputs
+      ansible.builtin.assert:
+        that:
+          - app_image_repository is defined
+          - app_image_repository | length > 0
+          - app_env_file is defined
+          - app_env_file | length > 0
+          - healthcheck_path is match('^/')
+        fail_msg: "Set app_image_repository, app_env_file, and a healthcheck_path starting with /."
+
+  tasks:
+    - name: Install base packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+        state: present
+        update_cache: true
+
+    - name: Create APT keyring directory
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Install Docker official GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Configure Docker APT repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch={{ docker_apt_arch }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        filename: docker
+        state: present
+        update_cache: true
+
+    - name: Install Docker Engine and Compose plugin
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+
+    - name: Enable Docker service
+      ansible.builtin.service:
+        name: docker
+        enabled: true
+        state: started
+
+    - name: Create application directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0750"
+
+    - name: Copy production environment file
+      ansible.builtin.copy:
+        src: "{{ app_env_file }}"
+        dest: "{{ app_dir }}/.env"
+        owner: root
+        group: root
+        mode: "0600"
+      no_log: true
+
+    - name: Render Docker Compose file
+      ansible.builtin.template:
+        src: files/docker-compose.yml.j2
+        dest: "{{ app_dir }}/docker-compose.yml"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Render Caddyfile
+      ansible.builtin.template:
+        src: files/Caddyfile.j2
+        dest: "{{ app_dir }}/Caddyfile"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Pull container images
+      ansible.builtin.command:
+        cmd: docker compose pull
+        chdir: "{{ app_dir }}"
+      register: compose_pull
+      changed_when: "'Downloaded newer image' in compose_pull.stdout or 'Pulling' in compose_pull.stdout"
+
+    - name: Start application stack
+      ansible.builtin.command:
+        cmd: docker compose up -d --remove-orphans
+        chdir: "{{ app_dir }}"
+      register: compose_up
+      changed_when: "'Started' in compose_up.stdout or 'Created' in compose_up.stdout or 'Recreated' in compose_up.stdout"
+
+    - name: Wait for API healthcheck through Caddy
+      ansible.builtin.uri:
+        url: "{{ healthcheck_url }}"
+        method: GET
+        status_code:
+          - 200
+          - 204
+          - 301
+          - 302
+        validate_certs: "{{ domain_name | length > 0 }}"
+      register: healthcheck_result
+      retries: 18
+      delay: 5
+      until: healthcheck_result.status is defined and healthcheck_result.status in [200, 204, 301, 302]
+
+    - name: Show Docker Compose status
+      ansible.builtin.command:
+        cmd: docker compose ps
+        chdir: "{{ app_dir }}"
+      register: compose_ps
+      changed_when: false
+
+    - name: Print Docker Compose status
+      ansible.builtin.debug:
+        var: compose_ps.stdout_lines
