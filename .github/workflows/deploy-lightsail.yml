@@ -35,7 +35,6 @@ jobs:
       SSH_USER: ${{ vars.SSH_USER || 'ubuntu' }}
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME || 'api.uty-app.com' }}
       CADDY_EMAIL: ${{ vars.CADDY_EMAIL }}
-      HEALTHCHECK_PATH: ${{ vars.HEALTHCHECK_PATH || '/health' }}
       APP_IMAGE_REPOSITORY: ${{ vars.APP_IMAGE_REPOSITORY || 'gbhsarl/uty-api' }}
       APP_IMAGE_TAG_OVERRIDE: ${{ vars.APP_IMAGE_TAG || 'latest' }}
       APP_IMAGE_TAG_INPUT: ${{ github.event.inputs.app_image_tag }}

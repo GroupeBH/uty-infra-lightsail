@@ -54,16 +54,18 @@ Mettre à jour `.env.production` localement, puis relancer :
 
 Le fichier est recopié vers `/opt/uty-api/.env` avec permission `0600`. Ne pas afficher ce fichier dans les logs, tickets ou captures.
 
-## Healthcheck
+## Vérification du Démarrage
 
-Par défaut, Ansible vérifie `/health` via Caddy. Si l'API expose plutôt `/categories` :
+Par défaut, le déploiement vérifie simplement que les services Docker Compose `app` et `caddy` sont bien démarrés.
+
+Pour contrôler l'état applicatif après déploiement :
 
 ```bash
-export HEALTHCHECK_PATH=/categories
-./deploy.sh
+cd /opt/uty-api
+sudo docker compose ps
+sudo docker compose logs -f --tail=200 app
+sudo docker compose logs -f --tail=200 caddy
 ```
-
-Si `DOMAIN_NAME` est défini, le healthcheck passe par `https://DOMAIN_NAME`. Le DNS doit donc pointer vers l'IP statique Lightsail.
 
 ## Certificats HTTPS
 

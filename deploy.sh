@@ -32,7 +32,6 @@ APP_IMAGE_REPOSITORY="${APP_IMAGE_REPOSITORY:-gbhsarl/uty-api}"
 APP_IMAGE_TAG="${APP_IMAGE_TAG:-latest}"
 APP_ENV_FILE="${APP_ENV_FILE:-${ROOT_DIR}/.env.production}"
 CADDY_EMAIL="${CADDY_EMAIL:-}"
-HEALTHCHECK_PATH="${HEALTHCHECK_PATH:-/health}"
 SSH_PRIVATE_KEY_PATH="${SSH_PRIVATE_KEY_PATH:-}"
 
 DOMAIN_NAME_ENV_IS_SET=0
@@ -48,14 +47,6 @@ if [[ ! -f "$APP_ENV_FILE" ]]; then
   echo "Set APP_ENV_FILE or create .env.production in this project directory." >&2
   exit 1
 fi
-
-case "$HEALTHCHECK_PATH" in
-  /*) ;;
-  *)
-    echo "HEALTHCHECK_PATH must start with /, for example /health or /categories." >&2
-    exit 1
-    ;;
-esac
 
 set_tf_var_from_env AWS_REGION aws_region
 set_tf_var_from_env ADMIN_CIDR admin_cidr
@@ -168,8 +159,7 @@ ansible-playbook \
   -e "app_image_tag=${APP_IMAGE_TAG}" \
   -e "app_env_file=${APP_ENV_FILE_ABS}" \
   -e "domain_name=${DOMAIN_NAME}" \
-  -e "caddy_email=${CADDY_EMAIL}" \
-  -e "healthcheck_path=${HEALTHCHECK_PATH}"
+  -e "caddy_email=${CADDY_EMAIL}"
 
 APP_URL="$(terraform -chdir="$TERRAFORM_DIR" output -raw app_url)"
 

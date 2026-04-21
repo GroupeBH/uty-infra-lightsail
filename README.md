@@ -118,7 +118,6 @@ export APP_ENV_FILE=.env.production
 export SSH_PRIVATE_KEY_PATH=~/.ssh/uty-lightsail.pem
 export DOMAIN_NAME=api.uty-app.com
 export CADDY_EMAIL=admin@uty-app.com
-export HEALTHCHECK_PATH=/health
 ```
 
 Pour tester d'abord en HTTP par IP, utiliser temporairement :

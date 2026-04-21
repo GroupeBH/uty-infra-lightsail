@@ -69,7 +69,6 @@ Variables recommandées :
 - `ADMIN_CIDR` : votre IP admin stable en `/32`.
 - `DOMAIN_NAME` : défaut `api.uty-app.com`.
 - `CADDY_EMAIL`.
-- `HEALTHCHECK_PATH` : défaut `/health`.
 - `APP_IMAGE_TAG` : optionnel. Défaut `latest`.
 - `LIGHTSAIL_BUNDLE_ID` : défaut `micro_3_0`.
 - `LIGHTSAIL_BLUEPRINT_ID` : défaut `ubuntu_24_04`.

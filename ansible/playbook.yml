@@ -9,11 +9,10 @@
     caddy_image: caddy:2.8-alpine
     caddy_email: ""
     domain_name: ""
-    healthcheck_path: /health
     docker_apt_arch: "{{ 'arm64' if ansible_architecture in ['aarch64', 'arm64'] else 'amd64' }}"
-    healthcheck_scheme: "{{ 'https' if domain_name | length > 0 else 'http' }}"
-    healthcheck_host: "{{ domain_name if domain_name | length > 0 else '127.0.0.1' }}"
-    healthcheck_url: "{{ healthcheck_scheme }}://{{ healthcheck_host }}{{ healthcheck_path }}"
+    expected_compose_services:
+      - app
+      - caddy
 
   pre_tasks:
     - name: Validate deployment inputs
@@ -23,8 +22,7 @@
           - app_image_repository | length > 0
           - app_env_file is defined
           - app_env_file | length > 0
-          - healthcheck_path is match('^/')
-        fail_msg: "Set app_image_repository, app_env_file, and a healthcheck_path starting with /."
+        fail_msg: "Set app_image_repository and app_env_file before deploying."
 
   tasks:
     - name: Install base packages
@@ -122,20 +120,15 @@
       register: compose_up
       changed_when: "'Started' in compose_up.stdout or 'Created' in compose_up.stdout or 'Recreated' in compose_up.stdout"
 
-    - name: Wait for API healthcheck through Caddy
-      ansible.builtin.uri:
-        url: "{{ healthcheck_url }}"
-        method: GET
-        status_code:
-          - 200
-          - 204
-          - 301
-          - 302
-        validate_certs: "{{ domain_name | length > 0 }}"
-      register: healthcheck_result
+    - name: Wait for Docker Compose services to be running
+      ansible.builtin.command:
+        cmd: docker compose ps --services --status running
+        chdir: "{{ app_dir }}"
+      register: compose_running
+      changed_when: false
       retries: 18
       delay: 5
-      until: healthcheck_result.status is defined and healthcheck_result.status in [200, 204, 301, 302]
+      until: (expected_compose_services | difference(compose_running.stdout_lines | map('trim') | reject('equalto', '') | list)) | length == 0
 
     - name: Show Docker Compose status
       ansible.builtin.command:
