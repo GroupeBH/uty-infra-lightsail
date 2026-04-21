@@ -28,7 +28,7 @@ require_cmd ansible-playbook
 require_cmd aws
 require_cmd ssh
 
-APP_IMAGE_REPOSITORY="${APP_IMAGE_REPOSITORY:-}"
+APP_IMAGE_REPOSITORY="${APP_IMAGE_REPOSITORY:-gbhsarl/uty-api}"
 APP_IMAGE_TAG="${APP_IMAGE_TAG:-latest}"
 APP_ENV_FILE="${APP_ENV_FILE:-${ROOT_DIR}/.env.production}"
 CADDY_EMAIL="${CADDY_EMAIL:-}"
@@ -42,10 +42,6 @@ else
   DOMAIN_NAME=""
 fi
 
-if [[ -z "$APP_IMAGE_REPOSITORY" ]]; then
-  echo "Set APP_IMAGE_REPOSITORY, for example: export APP_IMAGE_REPOSITORY=dockerhub-user/uty-api" >&2
-  exit 1
-fi
 
 if [[ ! -f "$APP_ENV_FILE" ]]; then
   echo "Application env file not found: $APP_ENV_FILE" >&2

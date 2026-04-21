@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       app_image_tag:
-        description: "Docker image tag to deploy. Empty uses repository variable APP_IMAGE_TAG, then the commit SHA."
+        description: "Docker image tag to deploy. Empty uses repository variable APP_IMAGE_TAG, then latest."
         required: false
         type: string
 
@@ -36,8 +36,8 @@ jobs:
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME || 'api.uty-app.com' }}
       CADDY_EMAIL: ${{ vars.CADDY_EMAIL }}
       HEALTHCHECK_PATH: ${{ vars.HEALTHCHECK_PATH || '/health' }}
-      APP_IMAGE_REPOSITORY: ${{ vars.APP_IMAGE_REPOSITORY }}
-      APP_IMAGE_TAG_OVERRIDE: ${{ vars.APP_IMAGE_TAG }}
+      APP_IMAGE_REPOSITORY: ${{ vars.APP_IMAGE_REPOSITORY || 'gbhsarl/uty-api' }}
+      APP_IMAGE_TAG_OVERRIDE: ${{ vars.APP_IMAGE_TAG || 'latest' }}
       APP_IMAGE_TAG_INPUT: ${{ github.event.inputs.app_image_tag }}
       TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET || 'uty-lightsail-tfstate' }}
       TF_BACKEND_KEY: ${{ vars.TF_BACKEND_KEY || 'uty-api-lightsail/terraform.tfstate' }}
@@ -72,11 +72,11 @@ jobs:
         env:
           LIGHTSAIL_SSH_PRIVATE_KEY: ${{ secrets.LIGHTSAIL_SSH_PRIVATE_KEY }}
           APP_ENV_PRODUCTION: ${{ secrets.APP_ENV_PRODUCTION }}
+          TERRAFORM_TFVARS: ${{ secrets.TERRAFORM_TFVARS }}
         run: |
           set -euo pipefail
 
-          : "${APP_IMAGE_REPOSITORY:?Set repository variable APP_IMAGE_REPOSITORY.}"
-          : "${TF_BACKEND_BUCKET:?Set repository variable TF_BACKEND_BUCKET for remote Terraform state.}"
+                    : "${TF_BACKEND_BUCKET:?Set repository variable TF_BACKEND_BUCKET for remote Terraform state.}"
           : "${LIGHTSAIL_SSH_PRIVATE_KEY:?Set secret LIGHTSAIL_SSH_PRIVATE_KEY.}"
           : "${APP_ENV_PRODUCTION:?Set secret APP_ENV_PRODUCTION.}"
 
@@ -87,6 +87,11 @@ jobs:
 
           install -m 600 /dev/null "$APP_ENV_FILE"
           printf '%s\n' "$APP_ENV_PRODUCTION" > "$APP_ENV_FILE"
+
+          if [[ -n "${TERRAFORM_TFVARS:-}" ]]; then
+            install -m 600 /dev/null terraform/terraform.tfvars
+            printf '%s\n' "$TERRAFORM_TFVARS" > terraform/terraform.tfvars
+          fi
 
           {
             printf 'bucket  = "%s"\n' "$TF_BACKEND_BUCKET"
@@ -113,10 +118,10 @@ jobs:
           runner_ip="$(curl -fsSL https://checkip.amazonaws.com | tr -d '[:space:]')"
           runner_cidr="${runner_ip}/32"
 
+          echo "TF_VAR_extra_ssh_cidrs=[\"$runner_cidr\"]" >> "$GITHUB_ENV"
+
           if [[ -z "$ADMIN_CIDR" ]]; then
             echo "ADMIN_CIDR=$runner_cidr" >> "$GITHUB_ENV"
-          else
-            echo "TF_VAR_extra_ssh_cidrs=[\"$runner_cidr\"]" >> "$GITHUB_ENV"
           fi
 
       - name: Validate Terraform and Ansible

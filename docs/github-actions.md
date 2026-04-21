@@ -18,9 +18,9 @@ Le workflow ne construit pas l'image Docker. Il déploie une image déjà publi�
 
 1. l'input manuel `app_image_tag` si le workflow est lancé à la main ;
 2. la variable GitHub `APP_IMAGE_TAG` si elle existe ;
-3. sinon le SHA du commit GitHub.
+3. sinon `latest`.
 
-Si vous utilisez le SHA par défaut, le pipeline applicatif du repository `uty-api` doit publier l'image Docker avec ce même tag.
+Par défaut, le workflow déploie donc `gbhsarl/uty-api:latest`.
 
 ## Secrets GitHub Requis
 
@@ -30,14 +30,35 @@ Dans `Settings > Secrets and variables > Actions > Secrets` :
 - `AWS_SECRET_ACCESS_KEY`
 - `LIGHTSAIL_SSH_PRIVATE_KEY` : contenu complet de la clé privée Lightsail par défaut de la région.
 - `APP_ENV_PRODUCTION` : contenu complet du fichier `.env.production`.
+- `TERRAFORM_TFVARS` : contenu complet de `terraform/terraform.tfvars`, sans secrets applicatifs. Recommandé pour éviter de créer beaucoup de variables GitHub.
 
 Ne pas stocker `.env.production` dans Git.
 
-## Variables GitHub Requises
+## Secret Terraform Tfvars
+
+Vous pouvez mettre tout le contenu de `terraform/terraform.tfvars` dans un seul secret GitHub nommé `TERRAFORM_TFVARS`.
+
+Exemple :
+
+```hcl
+aws_region        = "eu-central-1"
+availability_zone = "eu-central-1a"
+lightsail_bundle_id    = "micro_3_1"
+lightsail_blueprint_id = "ubuntu_24_04"
+admin_cidr = "TON_IP/32"
+key_pair_name = ""
+ssh_user      = "ubuntu"
+domain_name = "api.uty-app.com"
+```
+
+Ne mettez pas les variables applicatives NestJS dans `TERRAFORM_TFVARS`; elles vont dans `APP_ENV_PRODUCTION`.
+
+## Variables GitHub Optionnelles
 
 Dans `Settings > Secrets and variables > Actions > Variables` :
 
-- `APP_IMAGE_REPOSITORY` : exemple `dockerhub-user/uty-api`.
+- Aucune n'est strictement requise si vous gardez les valeurs par défaut du workflow.
+- `APP_IMAGE_REPOSITORY` : optionnel. Défaut `gbhsarl/uty-api`.
 
 Variables recommandées :
 
@@ -49,7 +70,7 @@ Variables recommandées :
 - `DOMAIN_NAME` : défaut `api.uty-app.com`.
 - `CADDY_EMAIL`.
 - `HEALTHCHECK_PATH` : défaut `/health`.
-- `APP_IMAGE_TAG` : utile si vous déployez toujours `latest` ou un tag stable.
+- `APP_IMAGE_TAG` : optionnel. Défaut `latest`.
 - `LIGHTSAIL_BUNDLE_ID` : défaut `micro_3_1`.
 - `LIGHTSAIL_BLUEPRINT_ID` : défaut `ubuntu_24_04`.
 - `INSTANCE_NAME` : défaut `uty-api-prod`.

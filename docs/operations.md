@@ -29,8 +29,8 @@ sudo docker compose logs -f --tail=200 caddy
 Depuis le poste local :
 
 ```bash
-export APP_IMAGE_REPOSITORY=dockerhub-user/uty-api
-export APP_IMAGE_TAG=2026-04-18
+export APP_IMAGE_REPOSITORY=gbhsarl/uty-api
+export APP_IMAGE_TAG=latest
 export APP_ENV_FILE=.env.production
 ./deploy.sh
 ```

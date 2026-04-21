@@ -112,8 +112,8 @@ chmod 600 .env.production
 Exporter les variables de déploiement :
 
 ```bash
-export APP_IMAGE_REPOSITORY=dockerhub-user/uty-api
-export APP_IMAGE_TAG=2026-04-18
+export APP_IMAGE_REPOSITORY=gbhsarl/uty-api
+export APP_IMAGE_TAG=latest
 export APP_ENV_FILE=.env.production
 export SSH_PRIVATE_KEY_PATH=~/.ssh/uty-lightsail.pem
 export DOMAIN_NAME=api.uty-app.com
@@ -156,7 +156,7 @@ Le workflow attend une image Docker déjà publiée sur Docker Hub. Il déploie 
 
 1. input manuel `app_image_tag` ;
 2. variable GitHub `APP_IMAGE_TAG` ;
-3. SHA du commit GitHub.
+3. `latest`.
 
 Secrets GitHub requis :
 
@@ -164,12 +164,13 @@ Secrets GitHub requis :
 - `AWS_SECRET_ACCESS_KEY`
 - `LIGHTSAIL_SSH_PRIVATE_KEY`
 - `APP_ENV_PRODUCTION`
+- `TERRAFORM_TFVARS`
 
 Variables GitHub minimales :
 
-- `APP_IMAGE_REPOSITORY`
+- Aucune si vous gardez les valeurs par défaut du workflow (`gbhsarl/uty-api:latest`).
 
-Voir [docs/github-actions.md](docs/github-actions.md) pour la configuration complète. Le backend Terraform utilise le bucket S3 `uty-lightsail-tfstate`.
+Voir [docs/github-actions.md](docs/github-actions.md) pour la configuration complète. Le backend Terraform utilise le bucket S3 `uty-lightsail-tfstate`. Pour éviter beaucoup de variables GitHub, mettez le contenu de `terraform/terraform.tfvars` dans le secret `TERRAFORM_TFVARS`. Si vous ne changez pas d'image, le workflow déploie par défaut `gbhsarl/uty-api:latest`.
 
 ## DNS
 
