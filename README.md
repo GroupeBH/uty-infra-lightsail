@@ -13,7 +13,7 @@ La cible initiale est volontairement sobre : une instance Linux/Unix Lightsail, 
 
 ## Coût Estimé
 
-Le bundle par défaut est `micro_3_1`, correspondant au plan Linux/Unix avec IPv4 public autour de 7 USD/mois : 1 GB RAM, 2 vCPU, 40 GB SSD et environ 2 TB de transfert mensuel inclus.
+Le bundle par défaut est `micro_3_0`, correspondant au plan Linux/Unix avec IPv4 public autour de 7 USD/mois : 1 GB RAM, 2 vCPU, 40 GB SSD et environ 2 TB de transfert mensuel inclus.
 
 Points de coût à garder en tête :
 
@@ -97,7 +97,7 @@ cp terraform/terraform.tfvars.example terraform/terraform.tfvars
 - `admin_cidr` : votre IP publique admin en `/32`, jamais `0.0.0.0/0` pour SSH.
 - `key_pair_name` : laisser vide `""` pour utiliser la clé par défaut Lightsail.
 - `aws_region` et `availability_zone` si vous ne voulez pas `eu-central-1`.
-- `lightsail_bundle_id` si AWS a remplacé `micro_3_1`.
+- `lightsail_bundle_id` si AWS a remplacé `micro_3_0`.
 - `domain_name` si vous utilisez autre chose que `api.uty-app.com`.
 
 Créer le fichier d'environnement applicatif local :

@@ -28,7 +28,7 @@ jobs:
       AWS_REGION: ${{ vars.AWS_REGION || 'eu-central-1' }}
       ADMIN_CIDR: ${{ vars.ADMIN_CIDR }}
       KEY_PAIR_NAME: ${{ vars.KEY_PAIR_NAME }}
-      LIGHTSAIL_BUNDLE_ID: ${{ vars.LIGHTSAIL_BUNDLE_ID || 'micro_3_1' }}
+      LIGHTSAIL_BUNDLE_ID: ${{ vars.LIGHTSAIL_BUNDLE_ID || 'micro_3_0' }}
       LIGHTSAIL_BLUEPRINT_ID: ${{ vars.LIGHTSAIL_BLUEPRINT_ID || 'ubuntu_24_04' }}
       INSTANCE_NAME: ${{ vars.INSTANCE_NAME || 'uty-api-prod' }}
       STATIC_IP_NAME: ${{ vars.STATIC_IP_NAME || 'uty-api-prod-ip' }}

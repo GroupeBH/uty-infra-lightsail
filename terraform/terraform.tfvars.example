@@ -7,7 +7,7 @@ static_ip_name = "uty-api-prod-ip"
 # Verify current values before production:
 # aws lightsail get-bundles --include-inactive
 # aws lightsail get-blueprints --include-inactive
-lightsail_bundle_id   = "micro_3_1"
+lightsail_bundle_id   = "micro_3_0"
 lightsail_blueprint_id = "ubuntu_24_04"
 
 # Restrict SSH to your real admin public IP/CIDR.

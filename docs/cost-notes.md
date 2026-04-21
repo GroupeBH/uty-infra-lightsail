@@ -21,7 +21,7 @@ Aucun service suivant n'est créé :
 
 ## Bundle Par Défaut
 
-`lightsail_bundle_id = "micro_3_1"`
+`lightsail_bundle_id = "micro_3_0"`
 
 Ce bundle correspond au plan Linux/Unix avec IPv4 public autour de 7 USD/mois, 1 GB RAM, 2 vCPU, 40 GB SSD et environ 2 TB de transfert mensuel.
 

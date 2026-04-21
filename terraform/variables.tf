@@ -29,9 +29,9 @@ variable "lightsail_blueprint_id" {
 }
 
 variable "lightsail_bundle_id" {
-  description = "Lightsail bundle ID. micro_3_1 is the Linux/Unix public IPv4 plan around 7 USD/month: 1 GB RAM, 2 vCPU, 40 GB SSD, 2 TB transfer. Verify with aws lightsail get-bundles --include-inactive."
+  description = "Lightsail bundle ID. micro_3_0 is the Linux/Unix public IPv4 plan around 7 USD/month: 1 GB RAM, 2 vCPU, 40 GB SSD, 2 TB transfer. Verify with aws lightsail get-bundles --include-inactive."
   type        = string
-  default     = "micro_3_1"
+  default     = "micro_3_0"
 }
 
 variable "key_pair_name" {

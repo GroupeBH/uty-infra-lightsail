@@ -73,6 +73,28 @@ fi
 echo "Checking AWS credentials..."
 aws sts get-caller-identity >/dev/null
 
+LIGHTSAIL_BUNDLE_ID_EFFECTIVE="${TF_VAR_lightsail_bundle_id:-}"
+if [[ -z "$LIGHTSAIL_BUNDLE_ID_EFFECTIVE" && -f "${TERRAFORM_DIR}/terraform.tfvars" ]]; then
+  LIGHTSAIL_BUNDLE_ID_EFFECTIVE="$(
+    sed -n 's/^[[:space:]]*lightsail_bundle_id[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' "${TERRAFORM_DIR}/terraform.tfvars" | tail -n 1
+  )"
+fi
+LIGHTSAIL_BUNDLE_ID_EFFECTIVE="${LIGHTSAIL_BUNDLE_ID_EFFECTIVE:-micro_3_0}"
+AWS_REGION_EFFECTIVE="${AWS_REGION:-${AWS_DEFAULT_REGION:-unknown}}"
+
+echo "Checking Lightsail bundle availability for ${LIGHTSAIL_BUNDLE_ID_EFFECTIVE} in ${AWS_REGION_EFFECTIVE}..."
+available_bundle_id="$(
+  aws lightsail get-bundles \
+    --query "bundles[?bundleId=='${LIGHTSAIL_BUNDLE_ID_EFFECTIVE}'].bundleId | [0]" \
+    --output text
+)"
+if [[ "$available_bundle_id" != "$LIGHTSAIL_BUNDLE_ID_EFFECTIVE" ]]; then
+  echo "Lightsail bundle '${LIGHTSAIL_BUNDLE_ID_EFFECTIVE}' is not available in region '${AWS_REGION_EFFECTIVE}'." >&2
+  echo "Update LIGHTSAIL_BUNDLE_ID or TERRAFORM_TFVARS with a valid bundle such as micro_3_0." >&2
+  echo "You can inspect available bundle IDs with: aws lightsail get-bundles --query 'bundles[].bundleId' --output text" >&2
+  exit 1
+fi
+
 TERRAFORM_INIT_ARGS=()
 if [[ "${TERRAFORM_INIT_RECONFIGURE:-0}" == "1" ]]; then
   TERRAFORM_INIT_ARGS+=("-reconfigure")

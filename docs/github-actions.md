@@ -43,7 +43,7 @@ Exemple :
 ```hcl
 aws_region        = "eu-central-1"
 availability_zone = "eu-central-1a"
-lightsail_bundle_id    = "micro_3_1"
+lightsail_bundle_id    = "micro_3_0"
 lightsail_blueprint_id = "ubuntu_24_04"
 admin_cidr = "TON_IP/32"
 key_pair_name = ""
@@ -71,7 +71,7 @@ Variables recommandées :
 - `CADDY_EMAIL`.
 - `HEALTHCHECK_PATH` : défaut `/health`.
 - `APP_IMAGE_TAG` : optionnel. Défaut `latest`.
-- `LIGHTSAIL_BUNDLE_ID` : défaut `micro_3_1`.
+- `LIGHTSAIL_BUNDLE_ID` : défaut `micro_3_0`.
 - `LIGHTSAIL_BLUEPRINT_ID` : défaut `ubuntu_24_04`.
 - `INSTANCE_NAME` : défaut `uty-api-prod`.
 - `STATIC_IP_NAME` : défaut `uty-api-prod-ip`.
