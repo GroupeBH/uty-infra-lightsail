@@ -93,6 +93,7 @@ jobs:
           if [[ -n "${TERRAFORM_TFVARS:-}" ]]; then
             install -m 600 /dev/null terraform/terraform.tfvars
             printf '%s\n' "$TERRAFORM_TFVARS" > terraform/terraform.tfvars
+            terraform -chdir=terraform fmt terraform.tfvars
           fi
 
           {
