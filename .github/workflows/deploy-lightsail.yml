@@ -121,7 +121,8 @@ jobs:
           runner_ip="$(curl -fsSL https://checkip.amazonaws.com | tr -d '[:space:]')"
           runner_cidr="${runner_ip}/32"
 
-          echo "TF_VAR_extra_ssh_cidrs=[\"$runner_cidr\"]" >> "$GITHUB_ENV"
+          printf '{\n  "extra_ssh_cidrs": ["%s"]\n}\n' "$runner_cidr" > terraform/ci.auto.tfvars.json
+          chmod 600 terraform/ci.auto.tfvars.json
 
           if [[ -z "$ADMIN_CIDR" ]]; then
             echo "ADMIN_CIDR=$runner_cidr" >> "$GITHUB_ENV"
