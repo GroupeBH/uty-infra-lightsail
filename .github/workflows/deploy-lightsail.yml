@@ -42,7 +42,6 @@ jobs:
       TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET || 'uty-lightsail-tfstate' }}
       TF_BACKEND_KEY: ${{ vars.TF_BACKEND_KEY || 'uty-api-lightsail/terraform.tfstate' }}
       TF_BACKEND_REGION: ${{ vars.TF_BACKEND_REGION || vars.AWS_REGION || 'eu-central-1' }}
-      SSH_PRIVATE_KEY_PATH: ${{ runner.temp }}/ssh/lightsail_deploy_key
       APP_ENV_FILE: .env.production
       TERRAFORM_INIT_RECONFIGURE: "1"
 
@@ -79,6 +78,9 @@ jobs:
           : "${TF_BACKEND_BUCKET:?Set repository variable TF_BACKEND_BUCKET for remote Terraform state.}"
           : "${LIGHTSAIL_SSH_PRIVATE_KEY:?Set secret LIGHTSAIL_SSH_PRIVATE_KEY.}"
           : "${APP_ENV_PRODUCTION:?Set secret APP_ENV_PRODUCTION.}"
+
+          SSH_PRIVATE_KEY_PATH="${RUNNER_TEMP}/ssh/lightsail_deploy_key"
+          echo "SSH_PRIVATE_KEY_PATH=$SSH_PRIVATE_KEY_PATH" >> "$GITHUB_ENV"
 
           mkdir -p "$(dirname "$SSH_PRIVATE_KEY_PATH")"
           chmod 700 "$(dirname "$SSH_PRIVATE_KEY_PATH")"
