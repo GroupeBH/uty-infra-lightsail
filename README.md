@@ -9,7 +9,7 @@ La cible initiale est volontairement sobre : une instance Linux/Unix Lightsail, 
 - Terraform provisionne l'instance Lightsail, l'IP statique, l'attachement IP et les ports publics.
 - `deploy.sh` lance Terraform, lit les outputs, génère `ansible/inventory.ini`, attend SSH puis lance Ansible.
 - Ansible installe Docker et le plugin Docker Compose, crée `/opt/uty-api`, copie l'environnement applicatif local vers `/opt/uty-api/.env`, rend les templates Compose/Caddy et démarre les conteneurs.
-- Docker Compose exécute `app` en interne sur le port 3000 et `caddy` en public sur 80/443.
+- Docker Compose exécute `app` en interne sur le port 5000 et `caddy` en public sur 80/443.
 
 ## Coût Estimé
 
