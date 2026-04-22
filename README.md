@@ -98,7 +98,7 @@ cp terraform/terraform.tfvars.example terraform/terraform.tfvars
 - `key_pair_name` : laisser vide `""` pour utiliser la clé par défaut Lightsail.
 - `aws_region` et `availability_zone` si vous ne voulez pas `eu-central-1`.
 - `lightsail_bundle_id` si AWS a remplacé `micro_3_0`.
-- `domain_name` si vous utilisez autre chose que `api.uty-app.com`.
+- `domain_name` si vous utilisez autre chose que `api-lightsail.uty-app.com`.
 
 Créer le fichier d'environnement applicatif local :
 
@@ -116,7 +116,7 @@ export APP_IMAGE_REPOSITORY=gbhsarl/uty-api
 export APP_IMAGE_TAG=latest
 export APP_ENV_FILE=.env.production
 export SSH_PRIVATE_KEY_PATH=~/.ssh/uty-lightsail.pem
-export DOMAIN_NAME=api.uty-app.com
+export DOMAIN_NAME=api-lightsail.uty-app.com
 export CADDY_EMAIL=admin@uty-app.com
 ```
 
@@ -176,10 +176,10 @@ Voir [docs/github-actions.md](docs/github-actions.md) pour la configuration comp
 Quand Terraform affiche l'IP statique, créer ou modifier le record DNS :
 
 ```text
-api.uty-app.com.  A  <IP_STATIQUE_LIGHTSAIL>
+api-lightsail.uty-app.com.  A  <IP_STATIQUE_LIGHTSAIL>
 ```
 
-Pour HTTPS automatique avec Caddy, le DNS doit pointer vers l'IP Lightsail avant le déploiement avec `DOMAIN_NAME=api.uty-app.com`, ou au moins avant de relancer `./deploy.sh` avec le domaine activé.
+Pour HTTPS automatique avec Caddy, le DNS doit pointer vers l'IP Lightsail avant le déploiement avec `DOMAIN_NAME=api-lightsail.uty-app.com`, ou au moins avant de relancer `./deploy.sh` avec le domaine activé.
 
 ## Rollback Simple
 

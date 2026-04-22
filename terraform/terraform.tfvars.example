@@ -20,7 +20,7 @@ extra_ssh_cidrs = []
 key_pair_name = ""
 ssh_user      = "ubuntu"
 
-domain_name = "api.uty-app.com"
+domain_name = "api-lightsail.uty-app.com"
 
 tags = {
   Environment = "production"

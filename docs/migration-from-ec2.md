@@ -7,8 +7,8 @@ Objectif : migrer progressivement l'API vers Lightsail sans interrompre l'app Pl
 1. Déployer Lightsail avec `DOMAIN_NAME=` pour tester en HTTP par IP statique.
 2. Vérifier que Docker, Caddy et l'API démarrent correctement.
 3. Tester les endpoints principaux depuis un poste externe.
-4. Créer le record DNS `A api.uty-app.com` vers l'IP statique Lightsail.
-5. Relancer `./deploy.sh` avec `DOMAIN_NAME=api.uty-app.com` et `CADDY_EMAIL` défini.
+4. Créer le record DNS `A api-lightsail.uty-app.com` vers l'IP statique Lightsail.
+5. Relancer `./deploy.sh` avec `DOMAIN_NAME=api-lightsail.uty-app.com` et `CADDY_EMAIL` défini.
 6. Vérifier HTTPS et les logs Caddy.
 7. Surveiller les erreurs applicatives, la latence et les retours de l'app mobile.
 8. Garder l'ancienne infra EC2 active pendant une fenêtre d'observation.
@@ -30,14 +30,14 @@ Selon la configuration CORS ou les guards applicatifs, certains endpoints peuven
 Réduire le TTL DNS avant migration si possible. Ensuite :
 
 ```text
-api.uty-app.com.  A  <IP_STATIQUE_LIGHTSAIL>
+api-lightsail.uty-app.com.  A  <IP_STATIQUE_LIGHTSAIL>
 ```
 
 Après propagation :
 
 ```bash
-dig +short api.uty-app.com
-curl -i https://api.uty-app.com/health
+dig +short api-lightsail.uty-app.com
+curl -i https://api-lightsail.uty-app.com/health
 ```
 
 ## Rollback DNS

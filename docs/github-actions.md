@@ -48,7 +48,7 @@ lightsail_blueprint_id = "ubuntu_24_04"
 admin_cidr = "TON_IP/32"
 key_pair_name = ""
 ssh_user      = "ubuntu"
-domain_name = "api.uty-app.com"
+domain_name = "api-lightsail.uty-app.com"
 ```
 
 Ne mettez pas les variables applicatives NestJS dans `TERRAFORM_TFVARS`; elles vont dans `APP_ENV_PRODUCTION`.
@@ -67,7 +67,7 @@ Variables recommandées :
 - `TF_BACKEND_REGION` : défaut `AWS_REGION`.
 - `TF_BACKEND_KEY` : défaut `uty-api-lightsail/terraform.tfstate`.
 - `ADMIN_CIDR` : votre IP admin stable en `/32`.
-- `DOMAIN_NAME` : défaut `api.uty-app.com`.
+- `DOMAIN_NAME` : défaut `api-lightsail.uty-app.com`.
 - `CADDY_EMAIL`.
 - `APP_IMAGE_TAG` : optionnel. Défaut `latest`.
 - `LIGHTSAIL_BUNDLE_ID` : défaut `micro_3_0`.

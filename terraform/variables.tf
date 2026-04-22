@@ -70,7 +70,7 @@ variable "extra_ssh_cidrs" {
 variable "domain_name" {
   description = "Public API domain used for Terraform outputs. The Ansible deployment receives DOMAIN_NAME from deploy.sh; keep both aligned."
   type        = string
-  default     = "api.uty-app.com"
+  default     = "api-lightsail.uty-app.com"
 }
 
 variable "tags" {
