@@ -184,6 +184,102 @@
           delegate_to: localhost
           become: false
       rescue:
+        - name: Collect Docker Compose status after failed public check
+          ansible.builtin.command:
+            cmd: docker compose ps
+            chdir: "{{ app_dir }}"
+          register: compose_ps_after_public_check_failure
+          changed_when: false
+
+        - name: Print Docker Compose status after failed public check
+          ansible.builtin.debug:
+            var: compose_ps_after_public_check_failure.stdout_lines
+
+        - name: Collect app logs after failed public check
+          ansible.builtin.command:
+            cmd: docker compose logs --tail=200 app
+            chdir: "{{ app_dir }}"
+          register: app_logs_after_public_check_failure
+          changed_when: false
+
+        - name: Print app logs after failed public check
+          ansible.builtin.debug:
+            var: app_logs_after_public_check_failure.stdout_lines
+
+        - name: Get app container ID after failed public check
+          ansible.builtin.command:
+            cmd: docker compose ps -q app
+            chdir: "{{ app_dir }}"
+          register: app_container_id_after_public_check_failure
+          changed_when: false
+
+        - name: Get app container IP after failed public check
+          ansible.builtin.command:
+            argv:
+              - docker
+              - inspect
+              - -f
+              - "{{ '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' }}"
+              - "{{ app_container_id_after_public_check_failure.stdout }}"
+          register: app_container_ip_after_public_check_failure
+          changed_when: false
+          when: app_container_id_after_public_check_failure.stdout | length > 0
+
+        - name: Probe app container on port 3000 after failed public check
+          ansible.builtin.uri:
+            url: "http://{{ app_container_ip_after_public_check_failure.stdout }}:3000{{ public_check_path }}"
+            method: GET
+            status_code:
+              - 200
+              - 201
+              - 204
+              - 301
+              - 302
+              - 307
+              - 308
+              - 401
+              - 403
+              - 404
+              - 405
+            return_content: false
+            timeout: 10
+          register: app_probe_3000_after_public_check_failure
+          changed_when: false
+          failed_when: false
+          when: app_container_ip_after_public_check_failure.stdout | length > 0
+
+        - name: Probe app container on port 5000 after failed public check
+          ansible.builtin.uri:
+            url: "http://{{ app_container_ip_after_public_check_failure.stdout }}:5000{{ public_check_path }}"
+            method: GET
+            status_code:
+              - 200
+              - 201
+              - 204
+              - 301
+              - 302
+              - 307
+              - 308
+              - 401
+              - 403
+              - 404
+              - 405
+            return_content: false
+            timeout: 10
+          register: app_probe_5000_after_public_check_failure
+          changed_when: false
+          failed_when: false
+          when: app_container_ip_after_public_check_failure.stdout | length > 0
+
+        - name: Print direct app probe results after failed public check
+          ansible.builtin.debug:
+            msg:
+              - "app_container_ip={{ app_container_ip_after_public_check_failure.stdout | default('') }}"
+              - "port_3000_status={{ app_probe_3000_after_public_check_failure.status | default('unreachable') }}"
+              - "port_3000_msg={{ app_probe_3000_after_public_check_failure.msg | default('') }}"
+              - "port_5000_status={{ app_probe_5000_after_public_check_failure.status | default('unreachable') }}"
+              - "port_5000_msg={{ app_probe_5000_after_public_check_failure.msg | default('') }}"
+
         - name: Collect Caddy logs after failed public check
           ansible.builtin.command:
             cmd: docker compose logs --tail=200 caddy
