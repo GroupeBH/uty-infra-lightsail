@@ -142,6 +142,13 @@
         - caddyfile_template.changed
         - not (app_env_copy.changed or compose_template.changed)
 
+    - name: Restart Caddy to reload mounted config on every deploy
+      ansible.builtin.command:
+        cmd: docker compose restart caddy
+        chdir: "{{ app_dir }}"
+      register: caddy_restart
+      changed_when: true
+
     - name: Wait for Docker Compose services to be running
       ansible.builtin.command:
         cmd: docker compose ps --services --status running
